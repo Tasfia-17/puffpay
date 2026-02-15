@@ -1,6 +1,8 @@
 
 import React, { useState } from 'react';
-import { ArrowLeft, Edit2, Trash2, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Edit2, Trash2, CheckCircle2, ExternalLink } from 'lucide-react';
+import { useSendPayment } from '../hooks/useSendPayment';
+import type { Address } from 'viem';
 
 interface InvoiceDetailsProps {
   invoice: {
@@ -11,14 +13,17 @@ interface InvoiceDetailsProps {
     status: string;
     dueDate: string;
     itemDescription?: string;
+    clientWallet?: string;
+    txHash?: string;
   };
   onBack: () => void;
-  onMarkAsPaid: (id: string) => void;
+  onMarkAsPaid: (id: string, txHash?: string) => void;
   onDelete: (id: string) => void;
 }
 
 export const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ invoice, onBack, onMarkAsPaid, onDelete }) => {
   const [showSuccess, setShowSuccess] = useState(false);
+  const { sendPayment, isSending, error, txHash } = useSendPayment();
 
   // Mock data for line items since the main state doesn't have a detailed list yet
   const lineItems = [
@@ -30,12 +35,26 @@ export const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ invoice, onBack,
   const tax = subtotal * 0.1;
   const total = subtotal + tax;
 
-  const handleMarkAsPaidClick = () => {
-    setShowSuccess(true);
-    // Delay the transition back to allow user to see the success state
-    setTimeout(() => {
-      onMarkAsPaid(invoice.id);
-    }, 2000);
+  const handlePayInvoice = async () => {
+    if (!invoice.clientWallet) {
+      alert('No wallet address for this invoice');
+      return;
+    }
+
+    try {
+      const hash = await sendPayment(
+        invoice.clientWallet as Address,
+        invoice.amount.toString(),
+        invoice.invoiceId
+      );
+      
+      setShowSuccess(true);
+      setTimeout(() => {
+        onMarkAsPaid(invoice.id, hash);
+      }, 2000);
+    } catch (err) {
+      console.error('Payment failed:', err);
+    }
   };
 
   return (
@@ -101,14 +120,37 @@ export const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ invoice, onBack,
         </div>
       </div>
 
+      {/* Blockchain Transaction Info */}
+      {invoice.txHash && (
+        <div className="bg-[#0D0D0D] p-4 rounded-xl border border-purple-500/30 mb-4">
+          <p className="text-gray-500 text-[10px] font-bold uppercase mb-2">Transaction Hash</p>
+          <a 
+            href={`https://explore.tempo.xyz/tx/${invoice.txHash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-purple-400 text-xs font-mono flex items-center gap-2 hover:text-purple-300"
+          >
+            {invoice.txHash.slice(0, 10)}...{invoice.txHash.slice(-8)}
+            <ExternalLink className="w-3 h-3" />
+          </a>
+        </div>
+      )}
+
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-xl mb-4">
+          <p className="text-red-400 text-sm">{error}</p>
+        </div>
+      )}
+
       {/* Actions */}
       <div className="space-y-4">
         {invoice.status !== 'PAID' && (
           <button 
-            onClick={handleMarkAsPaidClick}
-            className="w-full bg-[#D8B4FE] text-black font-black py-5 rounded-full uppercase text-[12px] tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all"
+            onClick={handlePayInvoice}
+            disabled={isSending || !invoice.clientWallet}
+            className="w-full bg-[#D8B4FE] text-black font-black py-5 rounded-full uppercase text-[12px] tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            MARK AS PAID
+            {isSending ? 'PROCESSING...' : 'PAY WITH TEMPO'}
           </button>
         )}
         
@@ -135,11 +177,21 @@ export const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ invoice, onBack,
               <CheckCircle2 className="w-20 h-20 text-black stroke-[1.5]" />
             </div>
             <h2 className="text-black text-3xl font-black tracking-tight leading-none mb-4 uppercase">
-              PAYMENT<br />RECORDED!
+              PAYMENT<br />SENT!
             </h2>
             <p className="text-black/70 text-sm font-medium leading-relaxed max-w-[200px]">
-              Wallet updated successfully
+              Transaction confirmed on Tempo blockchain
             </p>
+            {txHash && (
+              <a 
+                href={`https://explore.tempo.xyz/tx/${txHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 text-black text-xs font-mono underline"
+              >
+                View on Explorer
+              </a>
+            )}
           </div>
         </div>
       )}

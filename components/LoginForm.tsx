@@ -1,86 +1,45 @@
-
-import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import React from 'react';
+import { usePrivy, useWallets } from '@privy-io/react-auth';
+import { Wallet } from 'lucide-react';
 
 interface LoginFormProps {
   onLoginSuccess: (email: string) => void;
 }
 
 export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { login, authenticated, user } = usePrivy();
+  const { wallets } = useWallets();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !password) return;
-    
-    setIsSubmitting(true);
-    // Simulate a brief loading state for a more functional feel
-    setTimeout(() => {
-      onLoginSuccess(email);
-      setIsSubmitting(false);
-    }, 800);
-  };
+  React.useEffect(() => {
+    if (authenticated && user?.email) {
+      onLoginSuccess(user.email.address);
+    }
+  }, [authenticated, user]);
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Email Input */}
-      <div className="flex flex-col gap-2">
-        <label className="text-gray-500 text-[11px] font-bold tracking-widest uppercase ml-1">
-          Email Address
-        </label>
-        <div className="relative group">
-          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-            <Mail className="h-5 w-5 text-gray-600 group-focus-within:text-purple-400 transition-colors" />
-          </div>
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-[#121212] border-2 border-transparent focus:border-purple-500 focus:outline-none rounded-2xl py-4 pl-12 pr-4 text-white text-sm transition-all duration-200"
-            placeholder="Enter your email"
-          />
-        </div>
-      </div>
+    <div className="space-y-6">
+      <div className="flex flex-col gap-4">
+        <button
+          onClick={login}
+          disabled={authenticated}
+          className="w-full bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 disabled:from-gray-600 disabled:to-gray-500 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-200 shadow-lg shadow-purple-500/30 hover:shadow-purple-400/40 disabled:shadow-none flex items-center justify-center gap-3"
+        >
+          <Wallet className="h-5 w-5" />
+          {authenticated ? 'Connected' : 'Connect Wallet & Sign In'}
+        </button>
 
-      {/* Password Input */}
-      <div className="flex flex-col gap-2">
-        <label className="text-gray-500 text-[11px] font-bold tracking-widest uppercase ml-1">
-          Password
-        </label>
-        <div className="relative group">
-          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-            <Lock className="h-5 w-5 text-gray-600 group-focus-within:text-purple-400 transition-colors" />
+        {authenticated && wallets[0] && (
+          <div className="bg-[#121212] border-2 border-purple-500/30 rounded-2xl p-4">
+            <p className="text-gray-400 text-xs mb-1">Connected Wallet</p>
+            <p className="text-white text-sm font-mono">
+              {wallets[0].address.slice(0, 6)}...{wallets[0].address.slice(-4)}
+            </p>
+            {user?.email && (
+              <p className="text-purple-400 text-xs mt-2">{user.email.address}</p>
+            )}
           </div>
-          <input
-            type={showPassword ? 'text' : 'password'}
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-[#121212] border-2 border-transparent focus:border-purple-500 focus:outline-none rounded-2xl py-4 pl-12 pr-12 text-white text-sm transition-all duration-200"
-            placeholder="••••••••"
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-600 hover:text-purple-400"
-          >
-            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-          </button>
-        </div>
+        )}
       </div>
-
-      {/* Submit Button */}
-      <button
-        type="submit"
-        disabled={isSubmitting || !email || !password}
-        className="w-full bg-purple-600 hover:bg-purple-500 active:scale-[0.98] text-white font-bold uppercase tracking-wider py-5 rounded-full shadow-lg shadow-purple-600/20 transition-all mt-4 disabled:opacity-50"
-      >
-        {isSubmitting ? 'Signing In...' : 'Sign In'}
-      </button>
-    </form>
+    </div>
   );
 };

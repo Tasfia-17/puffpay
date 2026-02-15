@@ -1,5 +1,7 @@
 
 import React, { useState } from 'react';
+import { useBalance } from '../hooks/useBalance';
+import { useWallets } from '@privy-io/react-auth';
 import { 
   Settings as SettingsIcon, Plus, TrendingUp, DollarSign, Users, Home, 
   FileText, CreditCard, Wallet, Trash2, 
@@ -40,12 +42,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [showSettings, setShowSettings] = useState(false);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null);
 
+  // Tempo blockchain integration
+  const { balance, isLoading: balanceLoading } = useBalance();
+  const { wallets } = useWallets();
+
   // Derived Stats
   const stats = {
     outstanding: invoices.filter(i => i.status !== 'PAID').reduce((acc, curr) => acc + curr.amount, 0),
     paidThisMonth: payments.reduce((acc, curr) => acc + curr.amount, 0),
     totalClients: clients.length,
-    walletBalance: walletBalance
+    walletBalance: parseFloat(balance) || walletBalance
   };
 
   const handleAddInvoice = (newInvoiceData: any) => {

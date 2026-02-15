@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, ChevronDown, Plus, Calendar, CheckCircle2 } from 'lucide-react';
 import { Client } from '../App';
+import { useWallets } from '@privy-io/react-auth';
 
 interface NewInvoiceProps {
   clients: Client[];
@@ -11,11 +12,13 @@ interface NewInvoiceProps {
 
 export const NewInvoice: React.FC<NewInvoiceProps> = ({ clients, onBack, onSend }) => {
   const [client, setClient] = useState('');
+  const [clientWallet, setClientWallet] = useState('');
   const [dueDate, setDueDate] = useState(new Date().toISOString().split('T')[0]);
   const [description, setDescription] = useState('');
   const [qty, setQty] = useState(1);
   const [rate, setRate] = useState(0);
   const [showSuccess, setShowSuccess] = useState(false);
+  const { wallets } = useWallets();
 
   const subtotal = qty * rate;
   const tax = subtotal * 0.1;
@@ -26,10 +29,15 @@ export const NewInvoice: React.FC<NewInvoiceProps> = ({ clients, onBack, onSend 
       alert("Please select a client");
       return;
     }
+    if (!clientWallet || !clientWallet.startsWith('0x')) {
+      alert("Please enter a valid wallet address for the client");
+      return;
+    }
     setShowSuccess(true);
     setTimeout(() => {
       onSend({
         client: client,
+        clientWallet: clientWallet,
         description: description || "Consulting Services",
         qty,
         rate,
@@ -67,6 +75,18 @@ export const NewInvoice: React.FC<NewInvoiceProps> = ({ clients, onBack, onSend 
           {clients.length === 0 && (
             <p className="text-pink-500 text-[10px] font-bold uppercase px-1">No clients found. Add one in the Clients tab first.</p>
           )}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label className="text-gray-500 text-[11px] font-bold tracking-widest uppercase ml-1">CLIENT WALLET ADDRESS</label>
+          <input
+            type="text"
+            value={clientWallet}
+            onChange={(e) => setClientWallet(e.target.value)}
+            placeholder="0x..."
+            className="w-full bg-[#121212] border-2 border-transparent focus:border-purple-500 rounded-xl py-4 px-4 text-white text-[15px] font-mono transition-all focus:outline-none"
+          />
+          <p className="text-gray-600 text-[10px] px-1">Tempo wallet address where client will pay from</p>
         </div>
 
         <div className="flex flex-col gap-2">
