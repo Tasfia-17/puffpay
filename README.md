@@ -2,13 +2,13 @@
 
 A modern invoice management system built with React, TypeScript, and **Tempo blockchain**. PuffPay enables instant stablecoin payments for freelancers and small businesses with blockchain-verified transactions.
 
-## 🚀 Tempo Hackathon Submission
+## Tempo Hackathon Submission
 
 **Track:** Consumer Payments & Social Finance  
 **Blockchain:** Tempo Testnet (Moderato)  
 **Chain ID:** 42431
 
-## ✨ Key Features
+## Key Features
 
 ### Blockchain-Powered Payments
 - **Instant Settlement** - Payments confirmed in seconds on Tempo blockchain
@@ -29,7 +29,7 @@ A modern invoice management system built with React, TypeScript, and **Tempo blo
 - **Payment Links** - Share invoices with clients
 - **Transaction Explorer** - View all payments on Tempo Explorer
 
-## 🔗 Tempo Features Used
+## Tempo Features Used
 
 | Feature | Implementation |
 |---------|---------------|
@@ -82,7 +82,7 @@ npm run dev
 
 The app will be available at `http://localhost:5173`
 
-## 🎯 How It Works
+## How It Works
 
 ### For Invoice Creators:
 1. **Login** - Connect wallet via Privy (email or wallet)
@@ -97,7 +97,7 @@ The app will be available at `http://localhost:5173`
 3. **Pay Invoice** - One-click payment with AlphaUSD
 4. **Confirmation** - Instant blockchain confirmation
 
-## 📝 Tempo Network Details
+## Tempo Network Details
 
 - **Network**: Tempo Testnet (Moderato)
 - **Chain ID**: 42431
@@ -105,7 +105,7 @@ The app will be available at `http://localhost:5173`
 - **Explorer**: https://explore.tempo.xyz
 - **Token**: AlphaUSD (`0x20c0000000000000000000000000000000000001`)
 
-## 🔧 Configuration
+## Configuration
 
 ### Tempo Blockchain
 The app uses Tempo's testnet with the following configuration:
@@ -147,7 +147,7 @@ puffpay/
 └── index.tsx               # React entry point
 ```
 
-## 🎨 Key Components
+## Key Components
 
 ### Payment Flow
 1. **NewInvoice** - Captures client wallet address
@@ -160,7 +160,7 @@ puffpay/
 - **TIP-20** - Tempo's token standard (ERC-20 compatible)
 - **Transfer with Memo** - Custom function for invoice tracking
 
-## 🚀 Demo Workflow
+## Demo Workflow
 
 1. **Create Account**: Login with email via Privy
 2. **Add Client**: Enter client name and Tempo wallet address
@@ -175,14 +175,14 @@ puffpay/
    - Instant blockchain confirmation
 6. **View Proof**: Transaction hash links to Tempo Explorer
 
-## 🔐 Security
+## Security
 
 - Non-custodial wallets (Privy embedded)
 - Client-side transaction signing
 - Blockchain-verified payments
 - Transparent transaction history
 
-## 🌐 Tempo Advantages
+## Tempo Advantages
 
 1. **Instant Finality** - No waiting for confirmations
 2. **Stablecoin Native** - No price volatility
@@ -190,7 +190,7 @@ puffpay/
 4. **Transaction Memos** - Built-in metadata support
 5. **EVM Compatible** - Standard Web3 tooling
 
-## 📊 Use Cases
+## Use Cases
 
 - Freelancer invoicing
 - Small business payments
@@ -198,7 +198,7 @@ puffpay/
 - Service billing
 - International payments (no FX fees)
 
-## 🛠️ Development
+## Development
 
 ### Adding New Features
 - Hooks are in `/hooks` directory
@@ -219,7 +219,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 This project is private and proprietary.
 
-## 🏆 Hackathon Highlights
+## Hackathon Highlights
 
 ### Innovation
 - First invoice platform on Tempo blockchain
